@@ -97,13 +97,13 @@ public class tb implements CommandExecutor {
                     UUID targetUUID = target.getUniqueId();
                     List<String> UUIDs = plugin.config.getStringList("passed-uuids");
                     if (UUIDs.contains(targetUUID.toString())) {
-                        sender.sendMessage(plugin.TB + "Player §e" + playerName + " §calready in whitelist!");
+                        sender.sendMessage(plugin.TB + "§cPlayer §e" + playerName + " §calready in whitelist!");
                         return true;
                     }
                     UUIDs.add(targetUUID.toString());
                     plugin.config.set("passed-uuids", UUIDs);
                     plugin.saveConfig();
-                    sender.sendMessage(plugin.TB + "§aPlayer §e" + playerName + " added to whitelist.");
+                    sender.sendMessage(plugin.TB + "§aPlayer §e" + playerName + "§a added to whitelist.");
                     return true;
                 } else {
                     sender.sendMessage(plugin.TB + "§cPlayer not online!");
