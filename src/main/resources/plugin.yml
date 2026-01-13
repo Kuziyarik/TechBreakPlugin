@@ -1,0 +1,31 @@
+name: TechBreak
+version: '1.0'
+main: v1xn.mcplugins.techbreak.TechBreak
+api-version: '1.21'
+load: STARTUP
+authors: [ vert1xn ]
+commands:
+  techbreak:
+    description: base tb plugin command
+    usage: /techbreak add | on | off | reload | rl (no arguments - toggle)
+    aliases: [ tb ]
+  tbreload:
+    description: reload the plugin
+    usage: /tb reload
+permissions:
+  v1x.tb:
+    default: op
+    description: Grants access to all TechBreak features
+    children:
+      v1x.tb.toggle: true
+      v1x.tb.add: true
+      v1x.tb.reload: true
+
+  v1x.tb.toggle:
+    description: Allows player to switch TB state
+    default: false
+  v1x.tb.add:
+    description: Allows player to add the other peoples to passed-uuids whitelist
+    default: false
+  v1x.tb.reload:
+    description: Allows player to reload the TB plugin
