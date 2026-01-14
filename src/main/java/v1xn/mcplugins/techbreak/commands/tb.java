@@ -1,7 +1,8 @@
 package v1xn.mcplugins.techbreak.commands;
 
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -23,7 +24,7 @@ public class tb implements CommandExecutor {
 
 
         if (args.length == 0) {
-            sender.sendMessage(plugin.TB + "§cUsage: /tb <add|on|off|reload>");
+            sender.sendMessage(plugin.TB + "§cUsage: /tb <add | remove | on | off | reload>");
             return true;
         }
 
@@ -72,9 +73,11 @@ public class tb implements CommandExecutor {
 
             if (plugin.isTB) {
                 List<String> allowed = plugin.config.getStringList("passed-uuids");
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    if (!allowed.contains(p.getUniqueId().toString())) {
-                        p.kick(Component.text(plugin.config.getString("tb-message", "§cServer under maintenance.")));
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (!allowed.contains(player.getUniqueId().toString())) {
+                        String message = plugin.config.getString("tb-message", "§cSorry. The server is currently being serviced.");
+                        String formatedMessage = ChatColor.translateAlternateColorCodes('&', message);
+                        player.kickPlayer(formatedMessage);
                     }
                 }
             }
@@ -92,8 +95,8 @@ public class tb implements CommandExecutor {
                 return true;
             } else {
                 String playerName = args[1];
-                Player target = Bukkit.getPlayerExact(playerName);
-                if (target != null) {
+                OfflinePlayer target = Bukkit.getOfflinePlayer(playerName);
+                if (target.hasPlayedBefore()) {
                     UUID targetUUID = target.getUniqueId();
                     List<String> UUIDs = plugin.config.getStringList("passed-uuids");
                     if (UUIDs.contains(targetUUID.toString())) {
@@ -106,12 +109,45 @@ public class tb implements CommandExecutor {
                     sender.sendMessage(plugin.TB + "§aPlayer §e" + playerName + "§a added to whitelist.");
                     return true;
                 } else {
-                    sender.sendMessage(plugin.TB + "§cPlayer not online!");
+                    sender.sendMessage(plugin.TB + "§cPlayer has never joined this server!");
                     return true;
                 }
             }
         }
-        sender.sendMessage(plugin.TB + "§cUnknown subcommand. Use: add, on, off, reload");
+
+        // ===REMOVE===
+        if (sub.equals("remove")){
+            if (args.length != 2){
+                sender.sendMessage(plugin.TB + "§cUsage: /tb remove <player>");
+                return true;
+            }
+            if (!sender.hasPermission("v1x.tb.remove")){
+                sender.sendMessage(plugin.TB + "§cYou do not have permission to use this command.");
+                return true;
+            } else {
+                String playerName = args[1];
+                    OfflinePlayer target = Bukkit.getOfflinePlayer(playerName);
+                if (!target.hasPlayedBefore()){
+                    sender.sendMessage(plugin.TB + "§cPlayer has never joined this server!");
+                    return true;
+                }
+
+                UUID targetUUID = target.getUniqueId();
+                List<String> UUIDs = plugin.config.getStringList("passed-uuids");
+                if (UUIDs.contains(targetUUID.toString())) {
+                    UUIDs.remove(targetUUID.toString());
+                    plugin.config.set("passed-uuids", UUIDs);
+                    plugin.saveConfig();
+
+                    sender.sendMessage(plugin.TB + "§aPlayer §e" + playerName + " §aremoved from whitelist successfully!");
+                }else {
+                    sender.sendMessage(plugin.TB + "§cPlayer §e" + playerName + " §cdoesn't in whitelist");
+                    return true;
+                }
+            }
+            return true;
+        }
+        sender.sendMessage(plugin.TB + "§cUnknown subcommand. Use: add, remove, on, off, reload, rl");
         return true;
     }
 }

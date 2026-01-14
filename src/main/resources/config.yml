@@ -8,12 +8,13 @@ isTB: false
 # that is tb state
 # if true tech break is enabled and if false it disabled
 
-tb-message: "Tech break is enabled!"
+tb-message: "&aTech break is enabled!"
 # write what you want in commas ("" only)
 # you can use & or § for formatting just how you want
 # for § just press hold and press 21(on numpad) then release alt
 
-passed-uuids: [ "example", "example" ]
+passed-uuids: []
 # using command: /tb add <PlayerName>, you can add uuid
+# or using /tb remove <PlayerName>, you can remove uuid
 
 # #NoobGuideComments! 🦐

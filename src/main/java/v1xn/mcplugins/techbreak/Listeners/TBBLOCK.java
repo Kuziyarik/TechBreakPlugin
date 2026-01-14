@@ -1,5 +1,6 @@
 package v1xn.mcplugins.techbreak.Listeners;
 
+import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
@@ -23,7 +24,9 @@ public class TBBLOCK implements Listener {
         List<String> allowedUUIDs = plugin.config.getStringList("passed-uuids");
 
         if (!allowedUUIDs.contains(playerUUID.toString())) {
-            event.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, plugin.config.getString("tb-message", "§cSorry. The server is currently being serviced."));
+            String message = plugin.config.getString("tb-message", "§cSorry. The server is currently being serviced.");
+            String formatedMessage = ChatColor.translateAlternateColorCodes('&', message);
+            event.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, formatedMessage);
         }
     }
 }
