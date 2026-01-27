@@ -1,5 +1,5 @@
 name: TechBreak
-version: '1.1'
+version: '1.2'
 main: v1xn.mcplugins.techbreak.TechBreak
 api-version: '1.21'
 load: STARTUP

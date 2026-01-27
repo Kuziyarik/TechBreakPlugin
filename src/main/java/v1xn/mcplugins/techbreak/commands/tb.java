@@ -15,8 +15,23 @@ import java.util.UUID;
 public class tb implements CommandExecutor {
     private final TechBreak plugin;
 
+    String message;
+
     public tb(TechBreak plugin) {
         this.plugin = plugin;
+        message = ChatColor.translateAlternateColorCodes('&',
+                plugin.config.getString("tb-message", "§cSorry. The server is currently being serviced."));
+    }
+
+    private void kickIfTB() {
+        if (!plugin.isTB) return;
+        List<String> allowed = plugin.config.getStringList("passed-uuids");
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (!allowed.contains(player.getUniqueId().toString())) {
+                player.kickPlayer(message);
+            }
+        }
     }
 
     @Override
@@ -42,8 +57,24 @@ public class tb implements CommandExecutor {
                     sender.sendMessage(plugin.TB + "§cYou do not have permission to use this command.");
                     return true;
                 } else {
+
+                    Boolean CurrTbState = plugin.isTB;
+                    plugin.saveConfig();
                     plugin.reloadConfig();
+
+                    message = ChatColor.translateAlternateColorCodes('&',
+                            plugin.config.getString("tb-message", "§cSorry. The server is currently being serviced."));
+
+                    if (plugin.config.getBoolean("save-tb-state", true)) {
+                        plugin.config.set("isTB", CurrTbState);
+                    }else {
+                        plugin.isTB = plugin.config.getBoolean("isTB", false);
+                    }
+
                     sender.sendMessage(plugin.TB + "§aConfig reloaded!");
+
+                    kickIfTB();
+
                     return true;
                 }
             } else {
@@ -64,6 +95,7 @@ public class tb implements CommandExecutor {
             }
 
             plugin.isTB = sub.equals("on");
+
             if (plugin.config.getBoolean("save-tb-state")) {
                 plugin.config.set("isTB", plugin.isTB);
                 plugin.saveConfig();
@@ -71,16 +103,7 @@ public class tb implements CommandExecutor {
 
             sender.sendMessage(plugin.TB + "§aTechBreak mode is now " + (plugin.isTB ? "ON" : "OFF"));
 
-            if (plugin.isTB) {
-                List<String> allowed = plugin.config.getStringList("passed-uuids");
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    if (!allowed.contains(player.getUniqueId().toString())) {
-                        String message = plugin.config.getString("tb-message", "§cSorry. The server is currently being serviced.");
-                        String formatedMessage = ChatColor.translateAlternateColorCodes('&', message);
-                        player.kickPlayer(formatedMessage);
-                    }
-                }
-            }
+            kickIfTB();
             return true;
         }
 
@@ -137,6 +160,7 @@ public class tb implements CommandExecutor {
                 if (UUIDs.contains(targetUUID.toString())) {
                     UUIDs.remove(targetUUID.toString());
                     plugin.config.set("passed-uuids", UUIDs);
+                    kickIfTB();
                     plugin.saveConfig();
 
                     sender.sendMessage(plugin.TB + "§aPlayer §e" + playerName + " §aremoved from whitelist successfully!");
