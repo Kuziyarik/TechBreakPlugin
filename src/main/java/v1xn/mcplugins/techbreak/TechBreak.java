@@ -16,7 +16,11 @@ public final class TechBreak extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        saveDefaultConfig();
+
+        getConfig().addDefault("tb-message", "&aTech break is enabled!");
+        getConfig().options().copyDefaults(true);
+        saveConfig();
+
 
         getCommand("techbreak").setExecutor(new tb(this));
         getCommand("techbreak").setTabCompleter(new TabCompleter());
@@ -25,6 +29,9 @@ public final class TechBreak extends JavaPlugin {
 
     @Override
     public void onDisable() {
-
+        if (getConfig().getBoolean("save-tb-state", true)) {
+            getConfig().set("isTB", isTB);
+        }
+        saveConfig();
     }
 }
